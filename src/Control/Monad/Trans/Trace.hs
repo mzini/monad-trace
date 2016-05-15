@@ -8,13 +8,13 @@ module Control.Monad.Trans.Trace (
   , module C
 ) where
 
-import Data.Tree 
-import Control.Monad.State
+import Control.Applicative
 import Control.Monad.Except
 import Control.Monad.Reader
-import Control.Monad.Writer
+import Control.Monad.State
 import Control.Monad.Trace.Class as C
 import Control.Monad.Writer
+import Data.Tree
 
 data TreeCrumb a = TC a (Forest a)
 
@@ -66,10 +66,12 @@ instance Monad m => MonadTrace t (TraceT t m) where
   scopeTrace e m = modifyT (pushCtx e) *> m <* modifyT popCtx
   getTrace = zipperToTree <$> getT
 
-deriving instance (MonadWriter w m) => MonadWriter w (TraceT t m)
-deriving instance (MonadReader r m) => MonadReader r (TraceT t m)
-deriving instance (MonadError e m) => MonadError e (TraceT t m)
-deriving instance (MonadIO m) => MonadIO (TraceT t m)
+deriving instance MonadWriter w m => MonadWriter w (TraceT t m)
+deriving instance MonadReader r m => MonadReader r (TraceT t m)
+deriving instance MonadError e m => MonadError e (TraceT t m)
+deriving instance MonadIO m => MonadIO (TraceT t m)
+deriving instance (MonadPlus m, Alternative m) => Alternative (TraceT t m)
+deriving instance MonadPlus m => MonadPlus (TraceT t m)                                                 
 
 instance (MonadState s m) => MonadState s (TraceT t m) where
   get = lift get

@@ -7,16 +7,15 @@ import Control.Monad.Trans.Identity
 import Control.Monad.Trans.List
 import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Reader
-import qualified Control.Monad.Trans.RWS.Lazy as LazyRWS (RWST, get, put, state, mapRWST)
-import qualified Control.Monad.Trans.RWS.Strict as StrictRWS (RWST, get, put, state, mapRWST)
-import qualified Control.Monad.Trans.State.Lazy as Lazy (StateT, get, put, state, mapStateT)
-import qualified Control.Monad.Trans.State.Strict as Strict (StateT, get, put, state, mapStateT)
+import qualified Control.Monad.Trans.RWS.Lazy as LazyRWS (RWST, mapRWST)
+import qualified Control.Monad.Trans.RWS.Strict as StrictRWS (RWST, mapRWST)
+import qualified Control.Monad.Trans.State.Lazy as Lazy (StateT, mapStateT)
+import qualified Control.Monad.Trans.State.Strict as Strict (StateT, mapStateT)
 import Control.Monad.Trans.Writer.Lazy as Lazy
 import Control.Monad.Trans.Writer.Strict as Strict
-
 import Control.Monad.Trans.Class (lift)
-import Control.Monad
-import Data.Monoid
+
+
 import Data.Tree 
 
 class Monad m => MonadTrace t m | m -> t where
