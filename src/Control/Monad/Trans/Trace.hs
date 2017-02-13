@@ -29,6 +29,7 @@ pushCtx a (es,cs) = ([], TC a es : cs)
 
 popCtx :: TreeZipper a -> TreeZipper a
 popCtx (es, TC e' es' : cs) = (Node e' (reverse es) : es', cs)
+popCtx _                    = error "pop on empty context"
 
 zipperToTree :: TreeZipper a -> Forest a
 zipperToTree (ts, []) = reverse ts
@@ -40,12 +41,12 @@ newtype TraceT t m a = TraceT { runTraceT_ :: StateT (TreeZipper t) m a }
 
 runTraceT :: Monad m => TraceT t m a -> m (a, Forest t)
 runTraceT m = do
-  (a,z) <- flip runStateT ([],[]) (runTraceT_ m)
+  (a,z) <- runStateT (runTraceT_ m) ([],[])
   return (a, zipperToTree z)
 
 evalTraceT :: Monad m => TraceT t m a -> m a
 evalTraceT m = fst <$> runTraceT m
-  
+
 execTraceT :: Monad m => TraceT t m a -> m (Forest t)
 execTraceT m = snd <$> runTraceT m
 
@@ -70,8 +71,8 @@ deriving instance MonadWriter w m => MonadWriter w (TraceT t m)
 deriving instance MonadReader r m => MonadReader r (TraceT t m)
 deriving instance MonadError e m => MonadError e (TraceT t m)
 deriving instance MonadIO m => MonadIO (TraceT t m)
-deriving instance (MonadPlus m, Alternative m) => Alternative (TraceT t m)
-deriving instance MonadPlus m => MonadPlus (TraceT t m)                                                 
+deriving instance MonadPlus m => Alternative (TraceT t m)
+deriving instance MonadPlus m => MonadPlus (TraceT t m)
 
 instance (MonadState s m) => MonadState s (TraceT t m) where
   get = lift get
