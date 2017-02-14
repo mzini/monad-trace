@@ -20,9 +20,8 @@ data TreeCrumb a = TC a (Forest a)
 
 type TreeZipper a = (Forest a, [TreeCrumb a])
 
-
-add :: a -> TreeZipper a -> TreeZipper a
-add a (es,cs) = (Node a []:es, cs)
+addForest :: Forest a -> TreeZipper a -> TreeZipper a
+addForest f (es,cs) = (reverse f ++ es, cs)
 
 pushCtx :: a -> TreeZipper a -> TreeZipper a
 pushCtx a (es,cs) = ([], TC a es : cs)
@@ -63,7 +62,7 @@ getT :: Monad m => TraceT t m (TreeZipper t)
 getT = TraceT get
 
 instance Monad m => MonadTrace t (TraceT t m) where
-  trace e = modifyT (add e)
+  putTrace tr = modifyT (addForest tr)
   scopeTrace e m = modifyT (pushCtx e) *> m <* modifyT popCtx
   getTrace = zipperToTree <$> getT
 
